@@ -1,24 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View, ViewPropTypes } from 'react-native';
-import { Svg, Path, G } from 'react-native-svg';
+import { Svg, Path, G, Text, Circle, Defs, Use, LinearGradient, Stop } from 'react-native-svg';
 
 export default class CircularProgress extends React.PureComponent {
-  polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+  polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
     return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
+      x: centerX + (radius * Math.cos(angleInRadians)),
+      y: centerY + (radius * Math.sin(angleInRadians)),
     };
   }
 
-  circlePath(x, y, radius, startAngle, endAngle){
-    var start = this.polarToCartesian(x, y, radius, endAngle * 0.9999);
-    var end = this.polarToCartesian(x, y, radius, startAngle);
-    var largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-    var d = [
-        'M', start.x, start.y,
-        'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
+  circlePath(x, y, radius, startAngle, endAngle) {
+    const start = this.polarToCartesian(x, y, radius, endAngle * 0.9999);
+    const end = this.polarToCartesian(x, y, radius, startAngle);
+    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+    const d = [
+      'M', start.x, start.y,
+      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
     ];
     return d.join(' ');
   }
@@ -52,17 +52,42 @@ export default class CircularProgress extends React.PureComponent {
       height: offset,
       borderRadius: offset / 2,
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
     };
+
+    const circlePathArray = circlePath.split(' ');
 
     return (
       <View style={style}>
         <Svg
-          width={size}
-          height={size}
+          width={size + 20}
+          height={size + 20}
           style={{ backgroundColor: 'transparent' }}
         >
-          <G rotation={rotation} originX={size/2} originY={size/2}>
+          <Defs>
+            <LinearGradient id="greenGradient" x1="0%" y1="200%" x2="100%" y2="0%">
+              <Stop offset="0%" stopColor="#A4E04A" stopOpacity="1" />
+              <Stop offset="70%" stopColor="#A4E04A" stopOpacity="1" />
+              <Stop offset="100%" stopColor="#158139" stopOpacity="1" />
+            </LinearGradient>
+          </Defs>
+          <Defs>
+            <G id="circlePercentage">
+              <G>
+                <Circle r="17" fill="#A4E04A" />
+                <Text
+                  stroke="white"
+                  fill="white"
+                  textAnchor="middle"
+                  fontSize="12"
+                  y={-8}
+                >
+                  {`${Math.round(fill)}%`}
+                </Text>
+              </G>
+            </G>
+          </Defs>
+          <G rotation={rotation} originX={size / 2} originY={size / 2} x={10} y={10}>
             { backgroundColor && (
               <Path
                 d={backgroundPath}
@@ -74,11 +99,12 @@ export default class CircularProgress extends React.PureComponent {
             )}
             <Path
               d={circlePath}
-              stroke={tintColor}
+              stroke="url(#greenGradient)"
               strokeWidth={width}
               strokeLinecap={lineCap}
               fill="transparent"
             />
+            <Use rotation={-rotation} href="#circlePercentage" x={circlePathArray[1]} y={circlePathArray[2]} />
           </G>
         </Svg>
         {children && (
@@ -106,8 +132,12 @@ CircularProgress.propTypes = {
 };
 
 CircularProgress.defaultProps = {
+  style: null,
   tintColor: 'black',
   rotation: 90,
-  lineCap: 'butt',
-  arcSweepAngle: 360
+  lineCap: 'round',
+  arcSweepAngle: 360,
+  backgroundWidth: 0,
+  backgroundColor: 'black',
+  children: null,
 };
