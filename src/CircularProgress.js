@@ -66,8 +66,8 @@ export default class CircularProgress extends React.PureComponent {
         >
           <Defs>
             <LinearGradient id="greenGradient" x1="0%" y1="200%" x2="100%" y2="0%">
-              <Stop offset="0%" stopColor="#4A90E2" stopOpacity="1" />
-              <Stop offset="70%" stopColor="#1F69C1" stopOpacity="1" />
+              <Stop offset="0%" stopColor="#8CB8ED" stopOpacity="1" />
+              <Stop offset="70%" stopColor="#4A90E2" stopOpacity="1" />
               <Stop offset="100%" stopColor="#19208C" stopOpacity="1" />
             </LinearGradient>
           </Defs>
